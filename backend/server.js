@@ -6,23 +6,23 @@ import { connect } from "mongoose"
 import connectDB from "./server/config/mongoDB.js"
 
 
-const app=express()
+const app = express()
 
 
-const port=process.env.PORT || 4000
+const port = process.env.PORT || 4000
 connectDB()
 
 app.use(express.json())
 
 app.use(cookieParser())
-app.use(cors({credentials:true}))
+app.use(cors({ credentials: true }))
 
 
-app.get("/",(req,res)=>{
+app.get("/", (req, res) => {
     res.send("You are on Home page")
 })
 
 
-app.listen(port ,()=>{
+app.listen(port, () => {
     console.log(`Server is running on port ${port}`)
 })
