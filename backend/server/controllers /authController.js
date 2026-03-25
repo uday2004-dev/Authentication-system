@@ -50,7 +50,7 @@ export const register = async (req, res) => {
 
         })
 
-        return res.json({ success: true, message: "login successfully" })
+        return res.json({ success: true, message: "Register successfully" })
 
 
 
@@ -66,7 +66,7 @@ export const register = async (req, res) => {
 }
 
 export const login = async (req, res) => {
-    const { email, password } = req.body()
+    const { email, password } = req.body
 
     if (!email || !password) {
         return res.json({ success: false, message: "email and password are required" })
@@ -81,7 +81,7 @@ export const login = async (req, res) => {
         }
 
         const isMatch = await bcrypt.compare(password, user.password)
-        if (!password) {
+        if (!isMatch) {
             return res.json({ success: false, message: "please enter valid password" })
 
 
@@ -106,22 +106,22 @@ export const login = async (req, res) => {
         })
         return res.json({ success: true, message: "login successfully" })
     } catch (err) {
-        return register.json({ success: false, message: err.message })
+        return res.json({ success: false, message: err.message })
     }
 }
 
-export const logOut=async (res,req) => {
-    try{
-res.clearCookie('token',{
-    httpOnly: true,
+export const logOut = async (res, req) => {
+    try {
+        res.clearCookie('token', {
+            httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: process.env.NODE_ENV === 'production' ?
                 'none' : 'strict',
 
-})
-return res.json({   success:true,message:"logout successfully "})
-    }catch(err){
-return register.json({ success: false, message: err.message })
+        })
+        return res.json({ success: true, message: "logout successfully " })
+    } catch (err) {
+        return register.json({ success: false, message: err.message })
     }
-    
+
 }
