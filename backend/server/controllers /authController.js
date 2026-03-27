@@ -2,6 +2,7 @@ import express from "express"
 import bcrypt from "bcryptjs"
 import jwt from "jsonwebtoken"
 import userModel from "../models/userModel.js"
+import transporter from "../config/nodeMailer.js"
 
 export const register = async (req, res) => {
     const { name, email, password } = req.body
@@ -50,7 +51,23 @@ export const register = async (req, res) => {
 
         })
 
-        return res.json({ success: true, message: "Register successfully" })
+// Welcome Mail
+        const mailOption={
+            from:   process.env.SENDER_EMAIL,
+            to:email,
+            subject:"Welcome to Site",
+            text:`Welcome to our Site Your are account has been successfully created with the email id ${email}`
+        }
+
+        await transporter.sendMail(mailOption)
+        return res.json({ success: true,
+             message: "Register successfully",
+              user: {
+                    id: user._id,
+                    name: user.name,
+                    email: user.email
+                }
+            })
 
 
 
@@ -104,7 +121,13 @@ export const login = async (req, res) => {
             maxAge: 7 * 24 * 60 * 60 * 1000
 
         })
-        return res.json({ success: true, message: "login successfully" })
+        return res.json(
+            {
+                success: true,
+                message: "login successfully"
+              
+
+            })
     } catch (err) {
         return res.json({ success: false, message: err.message })
     }

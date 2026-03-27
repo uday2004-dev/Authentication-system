@@ -18,13 +18,17 @@ app.use(express.json())
 app.use(cookieParser())
 app.use(cors({ credentials: true }))
 
-//API endpoints
+// //API endpoints
 app.get("/", (req, res) => {
     res.send("You are on Home page")
 })
-app.use('/api/auth',authRouter)
+app.use('/api/auth', authRouter)
+
+
+
 
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`)
 })
+
