@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs"
 import jwt from "jsonwebtoken"
 import userModel from "../models/userModel.js"
 import transporter from "../config/nodeMailer.js"
+// import userId from "../middleware/userAuth.js"
 
 export const register = async (req, res) => {
     const { name, email, password } = req.body
@@ -134,7 +135,7 @@ export const login = async (req, res) => {
     }
 }
 
-export const logOut = async (res, req) => {
+export const logOut = async (req, res) => {
     try {
         res.clearCookie('token', {
             httpOnly: true,
@@ -151,66 +152,69 @@ export const logOut = async (res, req) => {
 }
 
 
-//send verification to user email
-
 export const sendVerifyOtp = async (req, res) => {
     try {
-        const { userId } = req.body
+        const userId = req.userId   // ✅ fix
 
         const user = await userModel.findById(userId)
-        if (user.isVerified) {
-            return res.json({ success: false, message: "Account already verfied" })
 
+        if (!user) {
+            return res.json({ success: false, message: "User not found" })
         }
 
+        if (user.isVerified) {
+            return res.json({ success: false, message: "Account already verified" })
+        }
 
         const otp = String(Math.floor(100000 + Math.random() * 900000))
 
         user.verifyOTP = otp
-
         user.verifyOTPExpireAt = Date.now() + 24 * 60 * 60 * 1000
-
 
         await user.save()
 
         const mailOption = {
             from: process.env.SENDER_EMAIL,
             to: user.email,
-            subject: "Accountant verification OTP",
-            text: `Your otp to verify your account ${otp}`
+            subject: "Account verification OTP",
+            text: `Your OTP is ${otp}`
         }
-        await transporter.sendMail(mailOption);
-        res.json({ success: true, message: "verification OTP sent on Email" })
+
+        await transporter.sendMail(mailOption)
+
+        res.json({ success: true, message: "OTP sent" })
 
     } catch (err) {
         res.json({ success: false, message: err.message })
     }
-
 }
 
 export const verifyEmail = async (req, res) => {
-    const { userId, otp } = req.body
-    if (!userId || otp) {
+    // const { userId, otp } = req.userId
+    const userId = req.userId
+    const { otp } = req.body
+    if (!userId || !otp) {
         return res.json({ success: false, message: "Missing Detailss" })
     }
     try {
 
-        const user=await userModel.findById(userId)
+        const user = await userModel.findById(userId)
 
-        if(!user){
-            return res.json({success:false,message:"user not found"})
+        if (!user) {
+            return res.json({ success: false, message: "user not found" })
         }
-        if(user.verifyOTP===''||user.verifyOTP!==otp){
-            return res.json({success:false,message:"Invalid otp"})
+        if (user.verifyOTP === '' || user.verifyOTP !== otp) {
+            return res.json({ success: false, message: "Invalid otp" })
 
-        }
-
-        if(user.verifyOTPExpireAt<Date.now()){
-            return res.json({success:false,message:"OTP Expired"})
         }
 
-        user.isVerified=true;
-        
+        if (user.verifyOTPExpireAt < Date.now()) {
+            return res.json({ success: false, message: "OTP Expired" })
+        }
+
+        user.isVerified = true;
+        await user.save()
+
     } catch (err) {
         return res.json({ success: false, message: err.message })
     }
