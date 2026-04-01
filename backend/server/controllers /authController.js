@@ -154,7 +154,7 @@ export const logOut = async (req, res) => {
 
 export const sendVerifyOtp = async (req, res) => {
     try {
-        const userId = req.userId   // ✅ fix
+        const userId = req.userId 
 
         const user = await userModel.findById(userId)
 
@@ -221,4 +221,16 @@ export const verifyEmail = async (req, res) => {
 
 
 
+}
+
+
+export const isAuthenticated=async (req,res) => {
+try{
+    return res.json({success:true})
+
+}catch(err){
+    return res.json({message:false,message:err.message})
+
+}
+    
 }
