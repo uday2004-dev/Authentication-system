@@ -154,7 +154,7 @@ export const logOut = async (req, res) => {
 
 export const sendVerifyOtp = async (req, res) => {
     try {
-        const userId = req.userId 
+        const userId = req.userId
 
         const user = await userModel.findById(userId)
 
@@ -224,13 +224,49 @@ export const verifyEmail = async (req, res) => {
 }
 
 
-export const isAuthenticated=async (req,res) => {
-try{
-    return res.json({success:true})
+export const isAuthenticated = async (req, res) => {
+    try {
+        return res.json({ success: true })
 
-}catch(err){
-    return res.json({message:false,message:err.message})
+    } catch (err) {
+        return res.json({ message: false, message: err.message })
+
+    }
 
 }
-    
+
+
+export const resetOTP = async (req, res) => {
+    const { email } = req.body;
+    if (!email) {
+        return res.json({ success: false, message: "Provide email first" })
+    }
+    try {
+        const user = await userModel.findOne({ email })
+        if (!user) {
+            return res.json({ success: false, message: "User not found" })
+        }
+        const otp = String(Math.floor(100000 + Math.random() * 900000))
+
+        user.resetOTP = otp
+        user.resetOTPExpireAt = Date.now() +15 * 60 * 1000
+
+        await user.save()
+
+        const mailOption = {
+            from: process.env.SENDER_EMAIL,
+            to: user.email,
+            subject: "Password Reset OTP",
+            text: `Your OTP is ${otp}`
+        }
+
+        await transporter.sendMail(mailOption)
+
+        res.json({ success: true, message: "OTP sent" })
+
+    } catch (err) {
+        return res.json({ success: false, message: err.message })
+
+    }
+
 }
