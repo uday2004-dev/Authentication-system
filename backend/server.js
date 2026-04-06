@@ -5,6 +5,7 @@
     import { connect } from "mongoose"
     import connectDB from "./server/config/mongoDB.js"
     import authRouter from "./server/routes/authRoutes.js"
+import userRouter from "./server/routes/userRoutes.js"
 
 
     const app = express()
@@ -23,6 +24,8 @@
         res.send("You are on Home page")
     })
     app.use('/api/auth', authRouter)
+    app.use('/api/auth',userRouter)
+
 
 
 
