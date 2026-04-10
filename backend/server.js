@@ -13,18 +13,23 @@ import userRouter from "./server/routes/userRoutes.js"
 
     const port = process.env.PORT || 4000
     connectDB()
+   
 
     app.use(express.json())
 
     app.use(cookieParser())
-    app.use(cors({ credentials: true }))
+   app.use(cors({
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    credentials: true
+}))
 
     // //API endpoints
     app.get("/", (req, res) => {
         res.send("You are on Home page")
     })
     app.use('/api/auth', authRouter)
-    app.use('/api/auth',userRouter)
+    app.use('/api/user',userRouter)
 
 
 
