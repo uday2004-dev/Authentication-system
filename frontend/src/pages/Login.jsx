@@ -165,7 +165,7 @@ const Login = () => {
           getUserData()
           navigate("/")
         } else {
-          toast.error(data.message)
+          toast.error(error.message)
         }
 
       } else {
@@ -181,7 +181,7 @@ const Login = () => {
           
         } else {
           // toast.error(data.msg)
-          toast.error(error.message)
+          toast.error(data.message)
           
         }
       }
