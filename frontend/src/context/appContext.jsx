@@ -3,7 +3,7 @@ import { createContext } from "react";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { useEffect } from "react";
-import { get } from "mongoose";
+// import { get } from "mongoose";
 
 export const AppContext = createContext()
 
@@ -13,26 +13,26 @@ export const AppContextProvider = (props) => {
     const [isLoggedIn, setIsLoggedIn] = useState(false)
     const [userData, setUserData] = useState(null)
 
-    const getAuthState = async () => {
-        try {
-            const { data } = await axios.get(
-                `${backendURL}/api/auth/userAuth`,
-                { withCredentials: true }
-            );
+const getAuthState = async () => {
+    try {
+        const { data } = await axios.get(
+            `${backendURL}/api/user/data`,
+            { withCredentials: true }
+        );
 
-            if (data.success) {
-                await getUserData();
-                setIsLoggedIn(true);
-            } else {
-                setIsLoggedIn(false);
-                setUserData(null);
-            }
-
-        } catch (error) {
+        if (data.success) {
+            setUserData(data.userData);
+            setIsLoggedIn(true);
+        } else {
             setIsLoggedIn(false);
             setUserData(null);
         }
-    };
+
+    } catch (error) {
+        setIsLoggedIn(false);
+        setUserData(null);
+    }
+};
 
 
     const getUserData = async () => {
